@@ -2,6 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import movies
 from routes import belly
+from routes import recommend
+from models import Movie
+from database import engine, Base
+import models
 
 
 app = FastAPI()
@@ -16,6 +20,14 @@ app.add_middleware(
 )
 app.include_router(movies.router)
 app.include_router(belly.router)
+app.include_router(recommend.router)
+Movie.__table__.create(bind=engine, checkfirst=True)
+Base.metadata.create_all(bind=engine)
+
+
+
+
+
 @app.get("/")
 def read_root():
     return {"message": "CineMatch backend is running"}
