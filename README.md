@@ -24,58 +24,38 @@ Shows top 5 curated movies with justification (“Recommended because you liked 
 
 
 🎭 2. Advanced Filters
-Genre (Action, Romance, Horror…)
-
-
-Language (English, Korean, French, etc.)
-
-
-Streaming platform (Netflix, Prime, Disney+)
-
-
-IMDb Rating slider (e.g. 7.5+ only)
-
-
-Runtime range (e.g. < 2 hours)
+- Genre (Action, Romance, Horror…)
+- Language (English, Korean, French, etc.)
+- Streaming platform (Netflix, Prime, Disney+)
+- IMDb Rating slider (e.g. 7.5+ only)
+- Runtime range (e.g. < 2 hours)
 
 
 📝 3. Review Summarizer
-Pulls user reviews from IMDb / TMDb
-
-
-Uses GPT-based summarization to display:
-
-
- “Most viewers found it emotionally powerful, with strong performances but a slow second act.”
+- Pulls user reviews from IMDb / TMDb
+- Uses GPT-based summarization to display:
+- “Most viewers found it emotionally powerful, with strong performances but a slow second act.”
 
 
 
 🧠 4. AI Mood Picker
-User selects a mood: “chill”, “heartbreak”, “dark thriller”
-
-
-App maps that to curated tag embeddings and recommends accordingly
+- User selects a mood: “chill”, “heartbreak”, “dark thriller”
+- App maps that to curated tag embeddings and recommends accordingly
 
 
 🔄 5. Real-Time Updates
-“New on Netflix” API feed
-
-
-Live push updates: “A trending horror film just hit Prime!”
+- “New on Netflix” API feed
+- Live push updates: “A trending horror film just hit Prime!”
 
 
 💾 6. Save & Watchlist
-Save favorite movies to personal list
-
-
-Optionally sync with Trakt.tv or Letterboxd API
+- Save favorite movies to personal list
+- Optionally sync with Trakt.tv or Letterboxd API
 
 
 🗣 7. Voice Command Input (Bonus)
-“Recommend me a romantic comedy under 90 minutes”
-
-
-Backend converts to filters using NLP
+- “Recommend me a romantic comedy under 90 minutes”
+- Backend converts to filters using NLP
 
 
 
@@ -83,59 +63,45 @@ Backend converts to filters using NLP
 Frontend (iOS):
 SwiftUI + Combine
 
-
-Charts for rating trends
-
-
-AVKit preview for trailers
+- Charts for rating trends
 
 
 Backend:
-FastAPI or Node.js (Express) REST API
-
-
-PostgreSQL (movie meta, user prefs)
-
-
-Redis (fast recache for trending queries)
-
-
-TMDb API or IMDb datasets as source
-
-
-GPT/OpenAI API for summarization
-
-
-Custom lightweight movie rec model using cosine similarity + metadata embedding
+- FastAPI or Node.js (Express) REST API
+- PostgreSQL (movie meta, user prefs)
+- Redis (fast recache for trending queries)
+- TMDb API or IMDb datasets as source
+- GPT/OpenAI API for summarization
+- Custom lightweight movie rec model using cosine similarity + metadata embedding
 
 
 ML/NLP:
-Content-based filtering using genre, keyword, actor/actress embeddings
+- Content-based filtering using genre, keyword, actor/actress embeddings
 
 
-Collaborative filtering (optional based on other user behavior)
+- Collaborative filtering (optional based on other user behavior)
 
 
-Sentiment + summarization (OpenAI or HuggingFace)
+- Sentiment + summarization (OpenAI or HuggingFace)
 
 
-Keyword → mood → movie tag map
+- Keyword → mood → movie tag map
 
 
 DevOps:
-Docker + Render/Vercel
+- Docker + Render/Vercel
 
 
-Firebase or Supabase for user auth
+- Firebase or Supabase for user auth
 
 
-GitHub Actions for CI/CD
+- GitHub Actions for CI/CD
 
 
 
 🧱 Database Schema (Sample)
-Users (id, email, preferences, mood_profile, created_at)
-Movies (id, title, genre[], rating, reviews[], cast, runtime, platform)
-Watchlist (user_id, movie_id, saved_at)
-Interactions (user_id, movie_id, liked, rating, skipped, timestamp)
-Recommendations (user_id, movie_id, reason, timestamp)
+ Users (id, email, preferences, mood_profile, created_at)
+ Movies (id, title, genre[], rating, reviews[], cast, runtime, platform)
+ Watchlist (user_id, movie_id, saved_at)
+ Interactions (user_id, movie_id, liked, rating, skipped, timestamp)
+ Recommendations (user_id, movie_id, reason, timestamp)
