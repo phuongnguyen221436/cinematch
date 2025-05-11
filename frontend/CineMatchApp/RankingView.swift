@@ -30,6 +30,8 @@ struct RankingView: View {
         let genreAverages = genreGroups.mapValues {
             $0.map { $0.1 }.reduce(0, +) / Double($0.count)
         }
+        print("🧪 Genre Scores: \(genreScores)")
+
 
         return genreAverages.max(by: { $0.value < $1.value })?.key ?? "Unknown"
     }
@@ -66,9 +68,15 @@ struct RankingView: View {
                         editingTitle: $movieTitle,
                         editingScore: $userScore,
                         saveMovies: saveWatchedMovies,
-                        fetchPosters: fetchPostersForWatchedMovies
+                        fetchPosters: fetchPostersForWatchedMovies,
+                        fetchDetails: { title, completion in
+                            fetchMovieDetails(for: title) { genres in
+                                completion(genres)
+                            }
+                        }
                     )
                 }
+
                 .toolbarBackground(Color.clear, for: .navigationBar)
                 .toolbarBackground(.visible, for: .navigationBar)
                 .onAppear {
@@ -114,7 +122,7 @@ struct RankingView: View {
 
     private var favoriteGenreView: some View {
         HStack {
-            Text("🌟 Your favorite genre might be:")
+            Text("✨ Your favorite genre might be:")
                 .font(.footnote)
                 .foregroundColor(.gray)
             Spacer()
@@ -122,18 +130,36 @@ struct RankingView: View {
                 .font(.subheadline.bold())
                 .foregroundColor(.purple)
         }
+        
         .padding(.horizontal)
     }
 
     private var movieListView: some View {
         LazyVStack(spacing: 16) {
-            ForEach(watchedMovies.sorted(by: { $0.score > $1.score }), id: \.id) { movie in
-                movieCard(movie)
+            ForEach(Array(watchedMovies.sorted(by: { $0.score > $1.score }).enumerated()), id: \.element.id) { index, movie in
+                HStack(alignment: .center, spacing: 12) {
+                    Circle()
+                        .fill(Color(red: 0.27, green: 0.36, blue: 0.28)) // same green as score badge
+                        .frame(width: 28, height: 28)
+                        .overlay(
+                            Text("\(index + 1)")
+                                .font(.caption.bold())
+                                .foregroundColor(.white)
+                        )
+                        .padding(.top, 3)
+
+                    movieCard(movie, index: index)
+
+                }
+
+                .padding(.leading, -4) // pulls everything closer to edge
+                .padding(.trailing, 8) // keep trailing spacing minimal
             }
         }
     }
 
-    private func movieCard(_ movie: MovieRating) -> some View {
+
+    private func movieCard(_ movie: MovieRating, index: Int) -> some View {
         HStack(spacing: 16) {
             AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w154\(posterPaths[movie.title] ?? "")")) { image in
                 image.resizable()
@@ -145,17 +171,22 @@ struct RankingView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text(movie.title)
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(Color(red: 0.95, green: 0.9, blue: 0.8))
-                Text("Release Year: \(String(movie.year))")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(Color(red: 0.98, green: 0.88, blue: 0.65))
                 HStack(spacing: 8) {
-
                     Text("IMDB: \(String(format: "%.1f", movie.imdbScore))")
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.85))
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(Color(red: 0.98, green: 0.88, blue: 0.65).opacity(0.6))
+
+                    Text("•")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(Color(red: 0.98, green: 0.88, blue: 0.65).opacity(0.6))
+
+
+                    Text("\(String(movie.year))")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(Color(red: 0.98, green: 0.88, blue: 0.65).opacity(0.6))
+
 
 
                 }
@@ -163,27 +194,31 @@ struct RankingView: View {
             
 
                 
-            }
+            } 
+            .frame(maxHeight: .infinity, alignment: .center)
 
             Spacer()
 
             Text(String(format: "%.1f", movie.score))
-                .font(.subheadline.bold())
-                .foregroundColor(.black)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.white)
                 .frame(width: 32, height: 32)
-                .background(Color.yellow.opacity(0.15))
-                .clipShape(Circle())
+                .background(Color(red: 0.27, green: 0.36, blue: 0.28))
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                
         }
         .padding()
         .background(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.white.opacity(1), lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: 5)
+                .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
                 .background(
                     RoundedRectangle(cornerRadius: 18)
-                        .fill(Color.white.opacity(0.1))
+                        .fill(Color.white.opacity(0.05))
                 )
         )
+        .cornerRadius(20)
         .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 3)
+        
     }
 
     private func posterView(for title: String) -> some View {
@@ -263,7 +298,7 @@ struct RankingView: View {
     }
 
 
-    func fetchMovieDetails(for title: String) {
+    func fetchMovieDetails(for title: String, completion: @escaping ([String]) -> Void) {
         guard let encodedTitle = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
               let movieURL = URL(string: "https://api.themoviedb.org/3/search/movie?query=\(encodedTitle)&api_key=01354bc576421f73305177aa13b63d86"),
               let genreURL = URL(string: "https://api.themoviedb.org/3/genre/movie/list?api_key=01354bc576421f73305177aa13b63d86") else {
@@ -293,18 +328,9 @@ struct RankingView: View {
                 let year = Int(movie.release_date.prefix(4)) ?? 0
 
                 DispatchQueue.main.async {
-                    let newMovie = MovieRating(
-                        id: UUID().hashValue,
-                        title: title,
-                        score: 5.0,
-                        genres: genres,
-                        imdbScore: imdbScore,
-                        year: year
-                    )
-                    watchedMovies.append(newMovie)
-                    saveWatchedMovies()
-                    print("✅ Retrieved movie details: \(newMovie)")
+                    completion(genres) // Just pass genres back
                 }
+
             }.resume()
         }.resume()
     }
