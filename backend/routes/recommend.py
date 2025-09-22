@@ -62,10 +62,6 @@ def recommend_movies(movie_id: int, mood: str = None, db: Session = Depends(get_
         return {"error": "Movie not found"}
     
     mood_vector = MOOD_EMBEDDINGS.get(mood.lower()) if mood else None
-    target_vec = movie_to_vector(target_movie, GENRE_MAP, mood_vector)
-    all_vecs   = [movie_to_vector(m, GENRE_MAP, mood_vector) for m in movies]
-
-    sims = compute_cosine_similarity(target_vec, all_vecs)
 
     target_vec = movie_to_vector(target_movie, GENRE_MAP)
     all_vecs = [movie_to_vector(m, GENRE_MAP) for m in movies]
