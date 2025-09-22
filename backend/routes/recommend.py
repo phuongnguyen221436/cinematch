@@ -28,7 +28,7 @@ def get_db():
     finally:
         db.close()
 
-# ✅ Helper: Convert SQLAlchemy model to dict
+# Helper: Convert SQLAlchemy model to dict
 def sqlalchemy_movie_to_dict(movie):
     return {
         "id": movie.id,
@@ -39,7 +39,7 @@ def sqlalchemy_movie_to_dict(movie):
     }
 
 
-# ✅ Helper: Human-readable explanation
+# Helper
 def generate_reason(target, candidate):
     shared_genres = set(target["genres"]) & set(candidate["genres"])
     reasons = []
@@ -51,7 +51,7 @@ def generate_reason(target, candidate):
         reasons.append("Critically acclaimed")
     return ", ".join(reasons) if reasons else "Similar profile"
 
-# ✅ Main route
+# Main route
 @router.get("/recommendations/{movie_id}")
 def recommend_movies(movie_id: int, mood: str = None, db: Session = Depends(get_db)):
     movies_raw = db.query(Movie).all()
